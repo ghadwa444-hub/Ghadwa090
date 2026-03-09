@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Chef, CartItem, MenuItem } from '@/core/domain/entities';
 import { AddToCartButton } from '@/presentation/components/ui/UIHelpers';
+import { optimizeImage } from '@/utils/imageUtils';
 
 interface ChefDetailsPageProps {
     chef: Chef;
@@ -28,7 +29,7 @@ export const ChefDetailsPage: React.FC<ChefDetailsPageProps> = ({ chef, onBack, 
         <div className="min-h-screen bg-gray-50 pt-24 pb-20 animate-fade-in">
             {/* Header Image (Cover) */}
             <div className="h-64 md:h-80 w-full relative">
-                <img src={chef.cover_image_url || chef.image_url || 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&q=80'} alt={`${chef.chef_name} cover`} className="w-full h-full object-cover" />
+                <img src={optimizeImage(chef.cover_image_url || chef.image_url, 800) || 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&q=80'} alt={`${chef.chef_name} cover`} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
                 <button onClick={onBack} className="absolute top-8 right-8 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/30 transition z-10 border border-white/30">
                     <i className="fa-solid fa-arrow-right"></i>
@@ -39,7 +40,7 @@ export const ChefDetailsPage: React.FC<ChefDetailsPageProps> = ({ chef, onBack, 
                 <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 relative z-10">
                     <div className="flex flex-col md:flex-row gap-6 items-start">
                         <div className="w-32 h-32 md:w-40 md:h-40 rounded-3xl border-4 border-white shadow-lg -mt-16 md:-mt-20 bg-white overflow-hidden shrink-0">
-                            <img src={chef.image_url || 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&q=80'} alt={chef.chef_name} className="w-full h-full object-cover" />
+                            <img src={optimizeImage(chef.image_url, 200) || 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&q=80'} alt={chef.chef_name} className="w-full h-full object-cover" />
                         </div>
 
                         <div className="flex-1 w-full">
@@ -100,7 +101,7 @@ export const ChefDetailsPage: React.FC<ChefDetailsPageProps> = ({ chef, onBack, 
                                     {chefMeals.map(meal => (
                                         <div key={meal.id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex gap-4 hover:shadow-md transition group h-full">
                                             <div className="w-32 h-32 shrink-0 rounded-xl overflow-hidden relative">
-                                                <img src={meal.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80'} alt={meal.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                <img src={optimizeImage(meal.image_url, 200) || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80'} alt={meal.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                             </div>
                                             <div className="flex-1 flex flex-col justify-between">
                                                 <div>

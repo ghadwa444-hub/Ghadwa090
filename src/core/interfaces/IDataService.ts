@@ -18,4 +18,5 @@ export interface IDataService {
     // Write / Actions
     submitOrder(order: any): Promise<boolean>;
     addReview(review: any): Promise<boolean>;
+    submitAmbassadorRequest(data: any): Promise<boolean>;
 }

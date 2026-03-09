@@ -2,6 +2,7 @@ import React from 'react';
 import { MenuItem, CartItem } from '@/core/domain/entities';
 import { AddToCartButton } from '@/presentation/components/ui/UIHelpers';
 import { PriceDisplay } from '@/presentation/components/shared/PriceDisplay';
+import { optimizeImage } from '@/utils/imageUtils';
 
 interface UnifiedProductCardProps {
     item: MenuItem;
@@ -46,7 +47,7 @@ export const UnifiedProductCard: React.FC<UnifiedProductCardProps> = ({
             {/* Image Section */}
             <div className="h-56 overflow-hidden relative bg-gray-50">
                 <img
-                    src={item.image_url || 'https://via.placeholder.com/400x300?text=Ghadwa'}
+                    src={optimizeImage(item.image_url, 400) || 'https://via.placeholder.com/400x300?text=Ghadwa'}
                     alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
                     loading="lazy"

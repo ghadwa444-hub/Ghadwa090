@@ -1,5 +1,6 @@
 import React from 'react';
 import { Chef } from '@/core/domain/entities';
+import { optimizeImage } from '@/utils/imageUtils';
 
 interface ChefCardProps {
   chef: Chef;
@@ -23,7 +24,7 @@ export const ChefCard: React.FC<ChefCardProps> = ({ chef, onClick, ordersCount =
       {/* Cover Image */}
       <div className="h-48 overflow-hidden relative bg-gray-100">
         <img
-          src={chef.cover_image_url || chef.image_url || 'https://via.placeholder.com/400x300?text=Chef'}
+          src={optimizeImage(chef.cover_image_url || chef.image_url, 600) || 'https://via.placeholder.com/400x300?text=Chef'}
           alt={`${chef.chef_name} cover`}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
@@ -49,7 +50,7 @@ export const ChefCard: React.FC<ChefCardProps> = ({ chef, onClick, ordersCount =
       <div className="relative px-6 -mt-12 flex justify-center mb-2">
         <div className="w-24 h-24 rounded-full border-[5px] border-white shadow-lg overflow-hidden bg-white z-10 relative group-hover:scale-105 transition-transform duration-300">
           <img
-            src={chef.image_url || 'https://via.placeholder.com/100x100?text=Chef'}
+            src={optimizeImage(chef.image_url, 200) || 'https://via.placeholder.com/100x100?text=Chef'}
             alt={chef.chef_name}
             className="w-full h-full object-cover"
           />

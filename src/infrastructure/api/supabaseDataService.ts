@@ -98,7 +98,13 @@ export const supabaseDataService: IDataService = {
             const chefStatusMap = new Map<string, boolean>();
 
             chefs.forEach((chef) => {
-                if (chef.chef_name) chefsMap.set(chef.chef_name.toLowerCase(), String(chef.id));
+                if (chef.chef_name) {
+                    const name = chef.chef_name.toLowerCase().trim();
+                    chefsMap.set(name, String(chef.id));
+                    // Also map variations without "شيف " prefix to handle inconsistencies
+                    const withoutPrefix = name.replace(/^شيف\s+/, '').replace(/^chef\s+/, '').trim();
+                    if (withoutPrefix !== name) chefsMap.set(withoutPrefix, String(chef.id));
+                }
                 chefStatusMap.set(String(chef.id), chef.is_active ?? true);
             });
 
@@ -110,8 +116,15 @@ export const supabaseDataService: IDataService = {
 
             return data.map((item: any) => {
                 let category = item.category || 'طواجن';
-                const chefName = item.chef?.toLowerCase();
-                const chefId = chefName ? chefsMap.get(chefName) : undefined;
+                const chefName = item.chef?.toLowerCase().trim();
+                let chefId = undefined;
+                if (chefName) {
+                    chefId = chefsMap.get(chefName);
+                    if (!chefId) {
+                        const withoutPrefix = chefName.replace(/^شيف\s+/, '').replace(/^chef\s+/, '').trim();
+                        chefId = chefsMap.get(withoutPrefix);
+                    }
+                }
                 const finalChefId = item.chef_id || chefId;
 
                 return {
@@ -137,7 +150,12 @@ export const supabaseDataService: IDataService = {
             const chefStatusMap = new Map<string, boolean>();
 
             chefs.forEach((chef) => {
-                if (chef.chef_name) chefsMap.set(chef.chef_name.toLowerCase(), String(chef.id));
+                if (chef.chef_name) {
+                    const name = chef.chef_name.toLowerCase().trim();
+                    chefsMap.set(name, String(chef.id));
+                    const withoutPrefix = name.replace(/^شيف\s+/, '').replace(/^chef\s+/, '').trim();
+                    if (withoutPrefix !== name) chefsMap.set(withoutPrefix, String(chef.id));
+                }
                 chefStatusMap.set(String(chef.id), chef.is_active ?? true);
             });
 
@@ -148,8 +166,15 @@ export const supabaseDataService: IDataService = {
             }
 
             return (data || []).map((item: any) => {
-                const chefName = item.chef?.toLowerCase();
-                const chefId = chefName ? chefsMap.get(chefName) : undefined;
+                const chefName = item.chef?.toLowerCase().trim();
+                let chefId = undefined;
+                if (chefName) {
+                    chefId = chefsMap.get(chefName);
+                    if (!chefId) {
+                        const withoutPrefix = chefName.replace(/^شيف\s+/, '').replace(/^chef\s+/, '').trim();
+                        chefId = chefsMap.get(withoutPrefix);
+                    }
+                }
                 const finalChefId = item.chef_id || chefId;
 
                 return {
@@ -174,7 +199,12 @@ export const supabaseDataService: IDataService = {
             const chefStatusMap = new Map<string, boolean>();
 
             chefs.forEach((chef) => {
-                if (chef.chef_name) chefsMap.set(chef.chef_name.toLowerCase(), String(chef.id));
+                if (chef.chef_name) {
+                    const name = chef.chef_name.toLowerCase().trim();
+                    chefsMap.set(name, String(chef.id));
+                    const withoutPrefix = name.replace(/^شيف\s+/, '').replace(/^chef\s+/, '').trim();
+                    if (withoutPrefix !== name) chefsMap.set(withoutPrefix, String(chef.id));
+                }
                 chefStatusMap.set(String(chef.id), chef.is_active ?? true);
             });
 
@@ -186,8 +216,15 @@ export const supabaseDataService: IDataService = {
             }
 
             return (boxesData || []).map((box: any) => {
-                const chefName = box.chef?.toLowerCase();
-                const chefId = chefName ? chefsMap.get(chefName) : undefined;
+                const chefName = box.chef?.toLowerCase().trim();
+                let chefId = undefined;
+                if (chefName) {
+                    chefId = chefsMap.get(chefName);
+                    if (!chefId) {
+                        const withoutPrefix = chefName.replace(/^شيف\s+/, '').replace(/^chef\s+/, '').trim();
+                        chefId = chefsMap.get(withoutPrefix);
+                    }
+                }
                 const finalChefId = box.chef_id || chefId;
 
                 return {
@@ -324,6 +361,15 @@ export const supabaseDataService: IDataService = {
         const { error } = await supabase.from('reviews').insert(review);
         if (error) {
             logger.error('SUPABASE', 'Error adding review', error);
+            return false;
+        }
+        return true;
+    },
+
+    submitAmbassadorRequest: async (data: any): Promise<boolean> => {
+        const { error } = await supabase.from('ambassadors').insert(data);
+        if (error) {
+            logger.error('SUPABASE', 'Error adding ambassador request', error);
             return false;
         }
         return true;

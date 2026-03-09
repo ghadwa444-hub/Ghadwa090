@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Admin User - Ghadwa</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #8b2525;
+      }
+      input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+      button {
+        background: #8b2525;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        margin-top: 10px;
+      }
+      button:hover {
+        background: #6b1c1c;
+      }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      .result {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 5px;
+        display: none;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+        margin-bottom: 20px;
+      }
+      code {
+        background: #f4f4f4;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔧 Create Admin User</h1>
+
+      <div class="result info">
+        <strong>Instructions:</strong><br />
+        1. Get your Supabase URL and Service Role Key from Dashboard → Settings → API<br />
+        2. Fill in the fields below<br />
+        3. Click "Create Admin User"<br />
+        4. Wait for success message
+      </div>
+
+      <div>
+        <label><strong>Supabase Project URL:</strong></label>
+        <input type="text" id="supabaseUrl" placeholder="https://xxxxx.supabase.co" />
+      </div>
+
+      <div>
+        <label><strong>Service Role Key:</strong></label>
+        <input type="password" id="serviceKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+        <small>Get this from: Dashboard → Settings → API → service_role key</small>
+      </div>
+
+      <button onclick="createAdmin()" id="createBtn">Create Admin User</button>
+
+      <div id="result" class="result"></div>
+    </div>
+
+    <script>
+      async function createAdmin() {
+        const url = document.getElementById("supabaseUrl").value.trim();
+        const key = document.getElementById("serviceKey").value.trim();
+        const resultDiv = document.getElementById("result");
+        const btn = document.getElementById("createBtn");
+
+        if (!url || !key) {
+          showResult("Please fill in both fields!", "error");
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Creating...";
+        resultDiv.style.display = "none";
+
+        try {
+          // Step 1: Delete old user if exists (using Admin API)
+          console.log("Deleting old user...");
+          try {
+            // First, try to get the user
+            const getUserRes = await fetch(`${url}/auth/v1/admin/users?email=admin@ghadwa.com`, {
+              headers: { apikey: key, Authorization: `Bearer ${key}` },
+            });
+
+            if (getUserRes.ok) {
+              const users = await getUserRes.json();
+              if (users.users && users.users.length > 0) {
+                const userId = users.users[0].id;
+                // Delete the user
+                await fetch(`${url}/auth/v1/admin/users/${userId}`, {
+                  method: "DELETE",
+                  headers: { apikey: key, Authorization: `Bearer ${key}` },
+                });
+                console.log("✅ Deleted old user");
+              }
+            }
+          } catch (e) {
+            console.log("No old user to delete or deletion failed (continuing anyway)");
+          }
+
+          // Step 2: Wait a moment for deletion to complete
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          // Step 3: Create user
+          console.log("Creating user...");
+          const userRes = await fetch(`${url}/auth/v1/admin/users`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: key,
+              Authorization: `Bearer ${key}`,
+            },
+            body: JSON.stringify({
+              email: "admin@ghadwa.com",
+              password: "Admin@Ghadwa#123",
+              email_confirm: true,
+              user_metadata: {
+                full_name: "Ghadwa Admin",
+                role: "admin",
+              },
+            }),
+          });
+
+          if (!userRes.ok) {
+            const error = await userRes.text();
+            throw new Error(`Failed to create user: ${error}`);
+          }
+
+          const user = await userRes.json();
+          console.log("User created:", user.id);
+
+          // Step 4: Create/update profile
+          console.log("Creating profile...");
+          const profileRes = await fetch(`${url}/rest/v1/profiles`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: key,
+              Authorization: `Bearer ${key}`,
+              Prefer: "return=representation",
+            },
+            body: JSON.stringify({
+              id: user.id,
+              full_name: "Ghadwa Admin",
+              whatsapp_number: "+201109318581",
+              delivery_address: "طنطا، مصر",
+              role: "admin",
+              is_active: true,
+            }),
+          });
+
+          if (!profileRes.ok && profileRes.status !== 409) {
+            // Try to update if exists
+            const updateRes = await fetch(`${url}/rest/v1/profiles?id=eq.${user.id}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                apikey: key,
+                Authorization: `Bearer ${key}`,
+              },
+              body: JSON.stringify({
+                role: "admin",
+                is_active: true,
+                full_name: "Ghadwa Admin",
+                whatsapp_number: "+201109318581",
+                delivery_address: "طنطا، مصر",
+              }),
+            });
+
+            if (!updateRes.ok) {
+              throw new Error("Failed to create/update profile");
+            }
+          }
+
+          showResult(
+            `✅ SUCCESS!<br><br>` +
+              `Admin user created successfully!<br><br>` +
+              `Email: <code>admin@ghadwa.com</code><br>` +
+              `Password: <code>Admin@Ghadwa#123</code><br><br>` +
+              `You can now log in to your app!`,
+            "success"
+          );
+        } catch (error) {
+          console.error("Error:", error);
+          showResult(
+            `❌ ERROR:<br><br>${error.message}<br><br>` +
+              `Make sure:<br>` +
+              `1. Supabase URL is correct<br>` +
+              `2. Service Role Key is correct (not anon key)<br>` +
+              `3. You have permission to use Admin API`,
+            "error"
+          );
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Create Admin User";
+        }
+      }
+
+      function showResult(message, type) {
+        const resultDiv = document.getElementById("result");
+        resultDiv.className = `result ${type}`;
+        resultDiv.innerHTML = message;
+        resultDiv.style.display = "block";
+      }
+    </script>
+  </body>
+</html>

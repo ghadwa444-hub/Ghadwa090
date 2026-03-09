@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from '@/application/context/DataContext';
 import { useCart } from '@/application/context/CartContext';
 import { UnifiedProductCard } from '@/presentation/features/home/UnifiedProductCard';
+import { optimizeImage } from '@/utils/imageUtils';
 
 export const ChefMenuPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -24,7 +25,11 @@ export const ChefMenuPage: React.FC = () => {
         // Match by chef_id
         if (item.chef_id && String(item.chef_id) === String(id)) return true;
         // Match by chef name (for items that don't have chef_id)
-        if (chef && item.chef && item.chef.toLowerCase() === chef.chef_name?.toLowerCase()) return true;
+        if (chef && item.chef) {
+            const itemName = item.chef.toLowerCase().replace(/^شيف\s+/, '').replace(/^chef\s+/, '').trim();
+            const chefName = chef.chef_name?.toLowerCase().replace(/^شيف\s+/, '').replace(/^chef\s+/, '').trim() || '';
+            if (itemName === chefName) return true;
+        }
         return false;
     });
 
@@ -33,7 +38,11 @@ export const ChefMenuPage: React.FC = () => {
         // Match by chef_id
         if (box.chef_id && String(box.chef_id) === String(id)) return true;
         // Match by chef name (for boxes that don't have chef_id)
-        if (chef && box.chef && box.chef.toLowerCase() === chef.chef_name?.toLowerCase()) return true;
+        if (chef && box.chef) {
+            const boxName = box.chef.toLowerCase().replace(/^شيف\s+/, '').replace(/^chef\s+/, '').trim();
+            const chefName = chef.chef_name?.toLowerCase().replace(/^شيف\s+/, '').replace(/^chef\s+/, '').trim() || '';
+            if (boxName === chefName) return true;
+        }
         return false;
     });
 
@@ -74,7 +83,7 @@ export const ChefMenuPage: React.FC = () => {
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
                         backgroundImage: chef.cover_image_url
-                            ? `url(${chef.cover_image_url})`
+                            ? `url(${optimizeImage(chef.cover_image_url, 800)})`
                             : 'linear-gradient(135deg, #8B2525 0%, #5a1818 100%)'
                     }}
                 >
@@ -95,7 +104,7 @@ export const ChefMenuPage: React.FC = () => {
                         {/* Chef Avatar */}
                         <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white flex-shrink-0">
                             {chef.image_url ? (
-                                <img src={chef.image_url} alt={chef.chef_name} className="w-full h-full object-cover" />
+                                <img src={optimizeImage(chef.image_url, 200)} alt={chef.chef_name} className="w-full h-full object-cover" />
                             ) : (
                                 <div className="w-full h-full bg-[#8B2525] flex items-center justify-center">
                                     <i className="fa-solid fa-user-chef text-3xl sm:text-4xl text-white"></i>
@@ -217,7 +226,7 @@ export const ChefMenuPage: React.FC = () => {
                                 <div key={box.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
                                     <div className="flex items-center gap-4 mb-4">
                                         {box.img && (
-                                            <img src={box.img} alt={box.name} className="w-20 h-20 rounded-xl object-cover" />
+                                            <img src={optimizeImage(box.img, 200)} alt={box.name} className="w-20 h-20 rounded-xl object-cover" />
                                         )}
                                         <div>
                                             <h3 className="font-bold text-gray-900">{box.name}</h3>

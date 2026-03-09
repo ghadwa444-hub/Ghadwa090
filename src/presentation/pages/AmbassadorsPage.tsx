@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PageHeader } from '@/presentation/components/shared/PageHeader';
+import { supabaseDataService } from '@/infrastructure/api/supabaseDataService';
 
 export const AmbassadorsPage: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -10,12 +11,35 @@ export const AmbassadorsPage: React.FC = () => {
         socialLink: '',
         message: ''
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Here we would typically send this to our API
-        alert('تم إرسال طلبك بنجاح! سنتواصل معك قريباً.');
-        setFormData({ name: '', phone: '', email: '', city: '', socialLink: '', message: '' });
+        setIsSubmitting(true);
+
+        try {
+            const success = await supabaseDataService.submitAmbassadorRequest({
+                name: formData.name,
+                phone: formData.phone,
+                email: formData.email,
+                city: formData.city,
+                socialLink: formData.socialLink,
+                message: formData.message,
+                status: 'pending'
+            });
+
+            if (success) {
+                alert('تم إرسال طلبك بنجاح! سنتواصل معك قريباً.');
+                setFormData({ name: '', phone: '', email: '', city: '', socialLink: '', message: '' });
+            } else {
+                alert('حدث مشكلة أثناء الإرسال. الرجاء المحاولة مرة أخرى.');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('حدث مشكلة أثناء الإرسال. الرجاء المحاولة مرة أخرى.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -293,9 +317,16 @@ export const AmbassadorsPage: React.FC = () => {
 
                         <button
                             type="submit"
-                            className="w-full py-4 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition-all duration-300 shadow-[0_8px_20px_-6px_rgba(34,197,94,0.5)] hover:shadow-[0_12px_25px_-6px_rgba(34,197,94,0.6)] text-lg transform hover:-translate-y-1"
+                            disabled={isSubmitting}
+                            className={`w-full py-4 text-white font-bold rounded-xl transition-all duration-300 shadow-[0_8px_20px_-6px_rgba(34,197,94,0.5)] text-lg transform ${isSubmitting ? 'bg-gray-400 cursor-not-allowed hidden-shadow' : 'bg-green-500 hover:bg-green-600 hover:shadow-[0_12px_25px_-6px_rgba(34,197,94,0.6)] hover:-translate-y-1'}`}
                         >
-                            إرسال الطلب
+                            {isSubmitting ? (
+                                <div className="flex items-center justify-center gap-2">
+                                    <i className="fa-solid fa-spinner animate-spin"></i> جاري الإرسال...
+                                </div>
+                            ) : (
+                                "إرسال الطلب"
+                            )}
                         </button>
 
                         <p className="text-center text-sm text-gray-400 mt-6 mt-4">

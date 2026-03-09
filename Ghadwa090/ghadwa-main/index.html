@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- Favicons & App Icons -->
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon/android-chrome-512x512.png" />
+  <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/favicon/android-chrome-512x512.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- Platform & Browser Theming -->
+  <meta name="theme-color" content="#8B2525" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="غدوة" />
+
+  <!-- Viewport & Basic Meta -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>غدوة | أكل بيتي يوصلك لحد بابك</title>
+  <meta name="description" content="اطلب أكل بيتي من شيفات محترفات وصل لحد بابك في الوقت" />
+
+  <!-- Open Graph for Social Sharing -->
+  <meta property="og:title" content="غدوة | أكل بيتي يوصلك لحد بابك" />
+  <meta property="og:description" content="اطلب أكل بيتي من شيفات محترفات وصل لحد بابك في الوقت" />
+  <meta property="og:image" content="/favicon/android-chrome-512x512.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ghadwa.app" />
+
+  <!-- Google Fonts: Almarai -->
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#fdf2f2',
+              100: '#fde6e6',
+              200: '#fbd0d0',
+              300: '#f8a9a9',
+              400: '#f27474',
+              500: '#e54545',
+              600: '#d12929',
+              700: '#b01d1d',
+              800: '#8b2525', // Brand Primary
+              900: '#752424',
+              950: '#400f0f',
+            },
+            warm: {
+              50: '#fdfbf7', // Warm off-white
+              100: '#faf6ed',
+              200: '#f5ead6',
+            }
+          },
+          fontFamily: {
+            sans: ['GhadwaFont', 'sans-serif'],
+            cairo: ['Cairo', 'sans-serif'], // Keep as fallback
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease-in-out',
+            'fade-in-up': 'fadeInUp 0.5s ease-out',
+            'slide-in-right': 'slideInRight 0.3s ease-out',
+            'bounce-slow': 'bounce 3s infinite',
+            'blob': 'blob 7s infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'scroll-vertical': 'scrollVertical 20s linear infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            slideInRight: {
+              '0%': { transform: 'translateX(-100%)' }, /* Adjusted for RTL */
+              '100%': { transform: 'translateX(0)' },
+            },
+            blob: {
+              '0%': { transform: 'translate(0px, 0px) scale(1)' },
+              '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+              '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+              '100%': { transform: 'translate(0px, 0px) scale(1)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-20px)' },
+            },
+            scrollVertical: {
+              '0%': { transform: 'translateY(0)' },
+              '100%': { transform: 'translateY(-50%)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #8B2525;
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .pattern-dots {
+      background-image: radial-gradient(currentColor 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+
+    /* Custom Font Setup */
+    @font-face {
+      font-family: 'GhadwaFont';
+      src: url('/assets/font/PingAR-Hairline.otf') format('opentype');
+      font-weight: 100;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'GhadwaFont';
+      src: url('/assets/font/PingAR-ExtraLight.otf') format('opentype');
+      font-weight: 200;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'GhadwaFont';
+      src: url('/assets/font/PingAR-Light.otf') format('opentype');
+      font-weight: 300;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'GhadwaFont';
+      src: url('/assets/font/PingAR-Regular.otf') format('opentype');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'GhadwaFont';
+      src: url('/assets/font/PingAR-Bold.otf') format('opentype');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'GhadwaFont';
+      src: url('/assets/font/PingAR-Heavy.otf') format('opentype');
+      font-weight: 800;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'GhadwaFont';
+      src: url('/assets/font/PingAR-Black.otf') format('opentype');
+      font-weight: 900;
+      font-style: normal;
+    }
+  </style>
+</head>
+
+<body class="bg-[#FDFBF7] text-gray-900 font-sans">
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

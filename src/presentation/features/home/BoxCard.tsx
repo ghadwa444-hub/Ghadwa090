@@ -2,6 +2,7 @@ import React from 'react'
 import { Box, CartItem, MenuItem, Chef } from '@/core/domain/entities'
 import { AddToCartButton } from '@/presentation/components/ui/UIHelpers'
 import { PriceDisplay } from '@/presentation/components/shared/PriceDisplay'
+import { optimizeImage } from '@/utils/imageUtils'
 
 interface BoxCardProps {
   box: Box
@@ -35,7 +36,7 @@ export const BoxCard: React.FC<BoxCardProps> = ({
       {/* IMAGE SECTION - Aspect Ratio 4:3 for better consistency */}
       <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
         <img
-          src={box.image_url || 'https://via.placeholder.com/400x300?text=Box'}
+          src={optimizeImage(box.image_url || box.img, 400) || 'https://via.placeholder.com/400x300?text=Box'}
           alt={box.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
           loading="lazy"

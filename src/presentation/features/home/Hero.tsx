@@ -20,7 +20,8 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, onOpenMenu }) => {
       <div className="absolute top-40 right-[-10%] w-[500px] h-[500px] bg-warm-200/40 rounded-full blur-3xl opacity-50 mix-blend-multiply filter animate-blob animation-delay-2000"></div>
 
       <div className="max-w-[1400px] mx-auto px-4 relative z-10 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-[100px] items-center">
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-[100px] items-center mt-12 md:mt-0">
 
           {/* Content Side */}
           <div className="text-center lg:text-right space-y-6 animate-fade-in-up order-2 lg:order-1 relative z-20">

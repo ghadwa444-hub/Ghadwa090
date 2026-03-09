@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { CartItem, MenuItem } from '@/core/domain/entities';
+import { optimizeImage } from '@/utils/imageUtils';
 
 interface CartDrawerProps {
     isOpen: boolean;
@@ -27,8 +28,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, cart, u
                         <span className="text-sm font-normal text-gray-500">({cart.length} منتج)</span>
                     </h2>
                     <div className="flex items-center gap-2">
-                         {cart.length > 0 && (
-                            <button 
+                        {cart.length > 0 && (
+                            <button
                                 onClick={onClearCart}
                                 className="w-8 h-8 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-colors"
                                 title="إفراغ السلة"
@@ -51,7 +52,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, cart, u
                     ) : (
                         cart.map(item => (
                             <div key={item.id} className="flex gap-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm relative group">
-                                <img src={item.image_url || 'https://via.placeholder.com/100x100?text=Product'} alt={item.name} className="w-20 h-20 rounded-lg object-cover flex-shrink-0 bg-gray-100" />
+                                <img src={optimizeImage(item.image_url, 200) || 'https://via.placeholder.com/100x100?text=Product'} alt={item.name} className="w-20 h-20 rounded-lg object-cover flex-shrink-0 bg-gray-100" />
                                 <div className="flex-grow">
                                     <div className="flex justify-between items-start mb-1">
                                         <h3 className="font-bold text-gray-900 text-sm line-clamp-2">{item.name}</h3>
@@ -63,7 +64,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, cart, u
                                         <p className="text-[#8B2525] font-bold text-sm">{item.price * item.quantity} ج.م</p>
                                         {item.quantity > 1 && <span className="text-xs text-gray-400">({item.price} ج.م للقطعة)</span>}
                                     </div>
-                                     {item.chef && <p className="text-xs text-gray-400 mb-2">من مطبخ: {item.chef}</p>}
+                                    {item.chef && <p className="text-xs text-gray-400 mb-2">من مطبخ: {item.chef}</p>}
                                     <div className="flex items-center gap-3 bg-white shadow-sm w-fit rounded-lg border border-gray-200">
                                         <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-8 h-7 flex items-center justify-center hover:bg-gray-50 rounded-r-lg transition-colors border-l border-gray-100">-</button>
                                         <span className="text-sm font-bold w-6 text-center">{item.quantity}</span>

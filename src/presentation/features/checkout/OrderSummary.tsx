@@ -1,5 +1,6 @@
 import React from 'react';
 import { CartItem, PromoCode } from '@/core/domain/entities';
+import { optimizeImage } from '@/utils/imageUtils';
 
 interface OrderSummaryProps {
     cart: CartItem[];
@@ -34,7 +35,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
             <div className="space-y-4 mb-6 max-h-60 overflow-y-auto custom-scrollbar">
                 {cart.map(item => (
                     <div key={item.id} className="flex gap-3 items-start">
-                        <img src={item.image_url || 'https://via.placeholder.com/100x100?text=Product'} alt={item.name} className="w-14 h-14 rounded-xl object-cover bg-gray-100 shrink-0" />
+                        <img src={optimizeImage(item.image_url, 100) || 'https://via.placeholder.com/100x100?text=Product'} alt={item.name} className="w-14 h-14 rounded-xl object-cover bg-gray-100 shrink-0" />
                         <div className="flex-1 min-w-0">
                             <h4 className="font-bold text-gray-900 text-sm leading-tight mb-1 line-clamp-1">{item.name}</h4>
                             <div className="flex items-center justify-between text-xs text-gray-500">
