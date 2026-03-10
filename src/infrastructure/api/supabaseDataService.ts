@@ -6,7 +6,7 @@ import { logger } from '@/infrastructure/logging/logger';
 import { MOCK_MENU, MOCK_BOXES, MOCK_CHEFS, MOCK_PROMOS, MOCK_SETTINGS } from '@/infrastructure/api/mockData';
 
 // --- Caching Layer to Reduce Supabase Egress & Requests ---
-const CACHE_TTL = 15 * 60 * 1000; // 15 minutes cache time
+const CACHE_TTL = 30 * 1000; // 30 seconds cache time
 
 const pendingRequests = new Map<string, Promise<any>>();
 
@@ -326,28 +326,67 @@ export const supabaseDataService: IDataService = {
         });
     },
 
-    // --- Write ---
     submitOrder: async (order: any): Promise<boolean> => {
         try {
             const { itemsDetails, items, ...orderData } = order;
+            const orderItems = itemsDetails || items || [];
+
+            // 1. Compute totals safely
+            const subtotal = orderItems.reduce((sum: number, item: any) => sum + ((item.price || item.unit_price || 0) * (item.quantity || 1)), 0);
+            const deliveryFee = orderData.delivery_fee || 0;
+            const providedTotal = orderData.total_amount || orderData.total;
+            const totalAmount = providedTotal ? Number(providedTotal) : (subtotal + deliveryFee);
+
+            // 2. Insert parent order
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            const chefIdVal = String(orderData.chef_id);
+            const validChefId = uuidRegex.test(chefIdVal) ? chefIdVal : null;
 
             const dbOrder = {
-                customer: orderData.customer_name || orderData.customer || orderData.name,
-                phone: orderData.customer_phone || orderData.phone,
-                address: orderData.delivery_address || orderData.address,
-                total: orderData.total_amount || orderData.total || orderData.subtotal,
+                customer_name: orderData.customer_name || orderData.customer || orderData.name || 'عميل',
+                customer_phone: orderData.customer_phone || orderData.phone || '',
+                delivery_address: orderData.delivery_address || orderData.address || '',
+                subtotal: subtotal,
+                delivery_fee: deliveryFee,
+                total_amount: totalAmount,
+                discount_amount: orderData.discount_amount || 0,
+                chef_id: validChefId,
                 status: 'pending',
-                items: itemsDetails?.map((i: any) => i.name).join(', ') || items?.map((i: any) => i.product_name).join(', ') || '',
-                items_details: itemsDetails || items || [],
+                payment_method: orderData.payment_method || 'cash',
+                payment_status: 'pending',
+                notes: orderData.notes || ''
             };
 
-            const { error: orderError } = await supabase
+            const { data: orderResult, error: orderError } = await supabase
                 .from('orders')
-                .insert(dbOrder);
+                .insert(dbOrder)
+                .select()
+                .single();
 
-            if (orderError) {
-                logger.error('SUPABASE', 'Error submitting order', orderError);
+            if (orderError || !orderResult) {
+                logger.error('SUPABASE', 'Error submitting main order', orderError);
                 return false;
+            }
+
+            // 3. Insert order items relation
+            if (orderItems.length > 0) {
+                const dbItems = orderItems.map((item: any) => ({
+                    order_id: orderResult.id,
+                    product_id: typeof item.id === 'string' && isNaN(Number(item.id)) ? null : (item.id || null),
+                    product_name: item.name || item.product_name || 'وجبة',
+                    quantity: item.quantity || 1,
+                    unit_price: item.price || item.unit_price || 0,
+                    total_price: (item.price || item.unit_price || 0) * (item.quantity || 1),
+                    image_url: item.img || item.image_url || '',
+                }));
+
+                const { error: itemsError } = await supabase
+                    .from('order_items')
+                    .insert(dbItems);
+
+                if (itemsError) {
+                    logger.error('SUPABASE', 'Error submitting order items', itemsError);
+                }
             }
 
             return true;
