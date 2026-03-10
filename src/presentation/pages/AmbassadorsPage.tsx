@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageHeader } from '@/presentation/components/shared/PageHeader';
 import { supabaseDataService } from '@/infrastructure/api/supabaseDataService';
 
@@ -12,6 +12,16 @@ export const AmbassadorsPage: React.FC = () => {
         message: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [ambassadorsList, setAmbassadorsList] = useState<any[]>([]);
+    const [showAll, setShowAll] = useState(false);
+
+    useEffect(() => {
+        const fetchAmbassadors = async () => {
+            const list = await supabaseDataService.getApprovedAmbassadors();
+            setAmbassadorsList(list);
+        };
+        fetchAmbassadors();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -177,39 +187,56 @@ export const AmbassadorsPage: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 px-2 md:px-0">
-                        <div className="relative group overflow-hidden rounded-3xl h-64 md:h-[350px] shadow-sm hover:shadow-xl transition-all duration-300">
-                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=500&q=80" alt="سفير" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent flex items-end p-5">
-                                <div className="text-white transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                                    <div className="flex items-center gap-2 font-medium text-sm md:text-base"><i className="fa-brands fa-instagram text-pink-500 bg-white p-1 rounded-md text-xs"></i> @sara.lifestyle</div>
+                        {(showAll ? ambassadorsList : ambassadorsList.slice(0, 4)).map((ambassador, index) => {
+                            const link = ambassador.socialLink || '';
+                            let iconClass = "fa-link text-blue-500 bg-white p-1 rounded-md text-xs";
+                            let handle = link.split('/').pop() || ambassador.name;
+
+                            if (link.includes('instagram.com')) {
+                                iconClass = "fa-brands fa-instagram text-pink-500 bg-white p-1 rounded-md text-xs";
+                                handle = `@${link.split('instagram.com/')[1]?.split('/')[0] || ambassador.name}`;
+                            } else if (link.includes('tiktok.com')) {
+                                iconClass = "fa-brands fa-tiktok text-black bg-white p-1 rounded-md text-xs";
+                                handle = `${link.split('tiktok.com/')[1]?.split('/')[0] || ambassador.name}`;
+                            } else if (link.includes('snapchat.com')) {
+                                iconClass = "fa-brands fa-snapchat text-yellow-400 bg-white p-1 rounded-md text-xs";
+                                handle = `@${link.split('snapchat.com/add/')[1]?.split('/')[0] || ambassador.name}`;
+                            } else if (link.includes('youtube.com') || link.includes('youtu.be')) {
+                                iconClass = "fa-brands fa-youtube text-red-600 bg-white p-1 rounded-md text-xs";
+                                handle = `${ambassador.name}`;
+                            }
+
+                            return (
+                                <div key={ambassador.id || index} className={`relative group overflow-hidden rounded-3xl h-64 md:h-[350px] shadow-sm hover:shadow-xl transition-all duration-300 ${index % 2 !== 0 ? 'md:mt-12' : ''}`}>
+                                    <img src={ambassador.image_url || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=500&q=80"} alt={ambassador.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                    <a href={link} target="_blank" rel="noopener noreferrer" className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent flex items-end p-5 cursor-pointer">
+                                        <div className="text-white transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 w-full">
+                                            <div className="font-bold text-sm mb-1">{ambassador.name}</div>
+                                            <div className="flex items-center gap-2 font-medium text-xs md:text-sm truncate">
+                                                <i className={iconClass}></i> <span className="truncate" dir="ltr">{handle}</span>
+                                            </div>
+                                        </div>
+                                    </a>
                                 </div>
+                            );
+                        })}
+
+                        {ambassadorsList.length === 0 && (
+                            <div className="col-span-2 md:col-span-4 text-center py-20 text-gray-500 bg-gray-50 rounded-3xl border border-gray-100">
+                                <i className="fa-solid fa-users text-5xl mb-4 text-gray-300"></i>
+                                <h3 className="text-xl font-bold mb-2">قريباً جداً</h3>
+                                <p>سيتم الإعلان عن سفرائنا المميزين قريباً.</p>
                             </div>
-                        </div>
-                        <div className="relative group overflow-hidden rounded-3xl h-64 md:h-[350px] md:mt-12 shadow-sm hover:shadow-xl transition-all duration-300">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" alt="سفير" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent flex items-end p-5">
-                                <div className="text-white transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                                    <div className="flex items-center gap-2 font-medium text-sm md:text-base"><i className="fa-brands fa-tiktok text-black bg-white p-1 rounded-md text-xs"></i> @ahmed_reviews</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="relative group overflow-hidden rounded-3xl h-64 md:h-[350px] shadow-sm hover:shadow-xl transition-all duration-300">
-                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=500&q=80" alt="سفير" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent flex items-end p-5">
-                                <div className="text-white transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                                    <div className="flex items-center gap-2 font-medium text-sm md:text-base"><i className="fa-brands fa-snapchat text-yellow-400 bg-white p-1 rounded-md text-xs"></i> @nour_daily</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="relative group overflow-hidden rounded-3xl h-64 md:h-[350px] md:mt-12 shadow-sm hover:shadow-xl transition-all duration-300">
-                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80" alt="سفير" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent flex items-end p-5">
-                                <div className="text-white transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                                    <div className="flex items-center gap-2 font-medium text-sm md:text-base"><i className="fa-brands fa-youtube text-red-600 bg-white p-1 rounded-md text-xs"></i> @khalid_eats</div>
-                                </div>
-                            </div>
-                        </div>
+                        )}
                     </div>
+
+                    {ambassadorsList.length > 4 && !showAll && (
+                        <div className="text-center mt-12">
+                            <button onClick={() => setShowAll(true)} className="inline-block px-8 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-full hover:bg-gray-50 hover:border-gray-300 hover:text-primary-600 transition-all shadow-sm text-sm">
+                                عرض جميع السفراء
+                            </button>
+                        </div>
+                    )}
                 </section>
 
                 {/* 4. نموذج الانضمام */}

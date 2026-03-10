@@ -412,5 +412,21 @@ export const supabaseDataService: IDataService = {
             return false;
         }
         return true;
+    },
+
+    getApprovedAmbassadors: async (): Promise<any[]> => {
+        return fetchWithCache('approved_ambassadors', async () => {
+            const { data, error } = await supabase
+                .from('ambassadors')
+                .select('*')
+                .eq('status', 'approved')
+                .not('image_url', 'is', null);
+
+            if (error) {
+                logger.error('SUPABASE', 'Error fetching approved ambassadors', error);
+                return [];
+            }
+            return data || [];
+        });
     }
 };

@@ -14,6 +14,7 @@ export interface IDataService {
     getContactSettings(): Promise<ContactSettings>;
     getPartners(): Promise<any[]>;
     getCategories(): Promise<Category[]>;
+    getApprovedAmbassadors(): Promise<any[]>;
 
     // Write / Actions
     submitOrder(order: any): Promise<boolean>;
