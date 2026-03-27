@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, useNavigate } from 'react-router-dom';
 import { DataProvider, useData } from '@/application/context/DataContext';
 import { CartProvider } from '@/application/context/CartContext';
 import { MainLayout } from '@/presentation/layouts/MainLayout';
@@ -56,10 +56,11 @@ import { AmbassadorsPage } from '@/presentation/pages/AmbassadorsPage';
 const HomePage = () => {
     const { offers, chefs, bestSellers, boxes, menuItems, frozenItems, healthyItems } = useData();
     const { updateQuantity, cart } = useCart(); // Refactor to useCart logic
+    const navigate = useNavigate();
 
     // TEMPORARY: Adapter for props based components until they are refactored
     const dummyNavigate = (page: string) => {
-        window.location.href = page === 'home' ? '/' : `/${page}`;
+        navigate(page === 'home' ? '/' : `/${page}`);
     };
 
     return (
@@ -71,7 +72,7 @@ const HomePage = () => {
             <HealthySection healthyItems={healthyItems} cart={cart} updateQuantity={updateQuantity} />
             <FrozenSection frozenItems={frozenItems} cart={cart} updateQuantity={updateQuantity} />
             <FullMenu menuItems={menuItems} cart={cart} updateQuantity={updateQuantity} chefs={chefs} />
-            <ChefsSection onNavigate={dummyNavigate} onChefClick={(chef) => { window.location.href = `/chef/${chef.id}`; }} chefs={chefs} />
+            <ChefsSection onNavigate={dummyNavigate} onChefClick={(chef) => { navigate(`/chef/${chef.id}`); }} chefs={chefs} />
 
             {/* <CustomerFeedback /> */}
             {/* <CareersSection /> */}
